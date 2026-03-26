@@ -3,16 +3,29 @@ import polars as pl
 from fastapi import FastAPI
 from pydantic import BaseModel
 
-MODEL_PATH = "./model/game_outcome_classifier.pkl"
+# Paths to the models and data
+OUTCOME_MODEL_PATH = "./model/game_outcome_classifier.pkl"
+SCORE_MODEL_PATH = "./model/nfl_score_model.joblib"
 STATS_PATH = "./data/nfl_2025_final_stats.csv"
 
+# Init FastAPI
 app = FastAPI()
-model = joblib.load(MODEL_PATH)
+
+# Load the models
+outcome_model = joblib.load(OUTCOME_MODEL_PATH)
+score_model = joblib.load(SCORE_MODEL_PATH)
+
+# Get the score bucket labels from the model
+BUCKET_LABELS = score_model.classes_
+
+# Load the stats into a Polars dataframe
 stats_2025 = pl.read_csv(STATS_PATH)
 
+# Define the request body for the prediction endpoint
 class MatchupRequest(BaseModel):
     home: str
     away: str
+
 
 @app.post("/predict")
 def predict(request: MatchupRequest):
@@ -20,8 +33,10 @@ def predict(request: MatchupRequest):
     home = stats_2025.filter(pl.col('team') == request.home)
     away = stats_2025.filter(pl.col('team') == request.away)
 
+    # === Predict the outcome of the game ===
+
     # Select the features for both teams
-    features = [[
+    outcome_features = [[
         home['win_pct'][0],
         home['ppg'][0],
         home['opp_ppg'][0],
@@ -31,21 +46,51 @@ def predict(request: MatchupRequest):
     ]]
 
     # Predict the outcome of the matchup with the selected features
-    prediction = model.predict(features)[0]
+    outcome_prediction = outcome_model.predict(outcome_features)[0]
 
     # Calculate the probability of the prediction
-    probability = model.predict_proba(features)[0]
+    outcome_probability = outcome_model.predict_proba(outcome_features)[0]
 
     # Get the winner of the matchup
-    winner = request.home if prediction == 1 else request.away
+    winner = request.home if outcome_prediction == 1 else request.away
 
     # Get the confidence of the prediction (in %)
     # selecting index 0 if the home team wins otherwise index 1 for away team
-    confidence = probability[1] if prediction == 1 else probability[0]
+    confidence = outcome_probability[1] if outcome_prediction == 1 else outcome_probability[0]
 
+    # === Predict the score range of the game ===
+
+    # Create features for home and away
+    # The model is run once per team so we need separate features
+    home_score_features = [[
+        home['ppg'][0],     # Home team points per game
+        home['opp_ppg'][0], # Home team points allowed per game
+        away['opp_ppg'][0]  # Opponents points allowed per game
+    ]]
+
+    away_score_features = [[
+        away['ppg'][0],
+        away['opp_ppg'][0],
+        home['opp_ppg'][0]
+    ]]
+
+    # Use the model to predict the probabilities for each score bucket for the teams.
+    home_score_probability = score_model.predict_proba(home_score_features)[0]
+    away_score_probability = score_model.predict_proba(away_score_features)[0]
+
+    # For home and away score probabilities, create a dictionary that maps labels to probabilities.
+    # This is a shorthand way to build a dictionary in Python called dctionary comprehension.
+    # Zip function: built in to Python and can combine two lists into a set of tuples, pairing the first items together, then the second items, etc.
+    home_score_dict = {label: round(probability, 2) for label, probability in zip(BUCKET_LABELS, home_score_probability.tolist())}
+    away_score_dict = {label: round(probability, 2) for label, probability in zip(BUCKET_LABELS, away_score_probability.tolist())}
+
+    # Return the predicted winner, confidence, and score probabilities for both teams.
     return {
         "winner": winner,
         "confidence": round(float(confidence), 2),
         "home_team": request.home,
-        "away_team": request.away
+        "away_team": request.away,
+
+        "home_score_probabilities": home_score_dict,
+        "away_score_probabilities": away_score_dict
     }
