@@ -1,0 +1,79 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+@model GameOutcomeClassifier.Models.ViewModels.PredictionViewModel;
+
+@{
+    // Split the view model
+    PredictionResult? predictionResult = Model.Result;
+    Dictionary<string, string> teams = Model.Teams;
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    @* Populate form inputs*@
+    <form method="post">
+        <select name="homeTeam" id="homeTeam">
+            @foreach (var item in teams)
+            {
+                <option value="@item.Key">@item.Value</option>
+            }
+        </select>
+        <select name="awayTeam" id="awayTeam">
+            @foreach (var item in teams)
+            {
+                <option value="@item.Key">@item.Value</option>
+            }
+        </select>
+        <button asp-controller="Home" asp-action="Predict" type="submit" class="btn btn-outline-primary">Go</button>
+    </form>
+
+    @* Check is the predictionResult is populated yet *@
+    @if (predictionResult != null)
+    {
+        // Apply styling to the winning team
+        var homeWinClass = predictionResult.Winner == predictionResult.HomeTeam ? "winner" : "";
+        var awayWinClass = predictionResult.Winner == predictionResult.AwayTeam ? "winner" : "";
+
+        <div class="d-flex">
+            <h1 class="@homeWinClass">@predictionResult.HomeTeam</h1>
+            <h1 class="@awayWinClass">@predictionResult.AwayTeam</h1>
+        </div>
+
+        <h1>@predictionResult.Confidence</h1>
+
+        // Matrix for score probabilities
+        <div id="probabilityMatrix" class="container text-center">
+
+        </div>
+
+        <table class="table table-bordered">
+            
+            <thead>
+                <tr>
+                    <th colspan="7">@predictionResult.AwayTeam</th>
+                </tr>
+                <tr>
+                    <th scope="col" class="table-head-col"></th>
+                    @foreach (var awayBucket in predictionResult.AwayScoreProbabilities)
+                    {
+                        <th scope="col">@awayBucket.Key</th>
+                    }
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">            
+                @foreach (var homeProbabilities in predictionResult.HomeScoreProbabilities)
+                {
+                    <tr>
+                        <td scope="row" class="table-head-col">@homeProbabilities.Key</td>
+                        @foreach (var awayProbabilities in predictionResult.AwayScoreProbabilities)
+                        {
+                            <td>@((homeProbabilities.Value * awayProbabilities.Value * 100).ToString("F0"))%</td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
