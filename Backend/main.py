@@ -1,12 +1,51 @@
 import joblib
 import polars as pl
-from fastapi import FastAPI
+import logging
+from fastapi import FastAPI, Request, status
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 # Paths to the models and data
 OUTCOME_MODEL_PATH = "./model/game_outcome_classifier.pkl"
 SCORE_MODEL_PATH = "./model/nfl_score_model.joblib"
 STATS_PATH = "./data/nfl_2025_final_stats.csv"
+
+# Define team names and abreviations
+team_names = {
+    "ARI": "Arizona Cardinals",
+    "ATL": "Atlanta Falcons",
+    "BAL": "Baltimore Ravens",
+    "BUF": "Buffalo Bills",
+    "CAR": "Carolina Panthers",
+    "CHI": "Chicago Bears",
+    "CIN": "Cincinnati Bengals",
+    "CLE": "Cleveland Browns",
+    "DAL": "Dallas Cowboys",
+    "DEN": "Denver Broncos",
+    "DET": "Detroit Lions",
+    "GB": "Green Bay Packers",
+    "HOU": "Houston Texans",
+    "IND": "Indianapolis Colts",
+    "JAX": "Jacksonville Jaguars",
+    "KC": "Kansas City Chiefs",
+    "LA": "Los Angeles Rams",
+    "LAC": "Los Angeles Chargers",
+    "LV": "Las Vegas Raiders",
+    "MIA": "Miami Dolphins",
+    "MIN": "Minnesota Vikings",
+    "NE": "New England Patriots",
+    "NO": "New Orleans Saints",
+    "NYG": "New York Giants",
+    "NYJ": "New York Jets",
+    "PHI": "Philadelphia Eagles",
+    "PIT": "Pittsburgh Steelers",
+    "SEA": "Seattle Seahawks",
+    "SF": "San Francisco 49ers",
+    "TB": "Tampa Bay Buccaneers",
+    "TEN": "Tennessee Titans",
+    "WAS": "Washington Commanders"
+}
 
 # Init FastAPI
 app = FastAPI()
@@ -94,3 +133,17 @@ def predict(request: MatchupRequest):
         "home_score_probabilities": home_score_dict,
         "away_score_probabilities": away_score_dict
     }
+
+# GET /teams endpoints
+@app.get('/teams')
+def get_teams():
+    teams = {team: team_names[team] for team in sorted(stats_2025['team'].to_list())}
+    return teams
+
+# === Error handling for validation errors ===
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+	exc_str = f'{exc}'.replace('\n', ' ').replace('   ', ' ')
+	logging.error(f"{request}: {exc_str}")
+	content = {'status_code': 10422, 'message': exc_str, 'data': None}
+	return JSONResponse(content=content, status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
