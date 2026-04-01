@@ -62,15 +62,15 @@ stats_2025 = pl.read_csv(STATS_PATH)
 
 # Define the request body for the prediction endpoint
 class MatchupRequest(BaseModel):
-    home: str
-    away: str
+    home_team: str
+    away_team: str
 
-
+# POST /predict endpoint
 @app.post("/predict")
 def predict(request: MatchupRequest):
     # Get the stats for the home and away teams from the 2025 season
-    home = stats_2025.filter(pl.col('team') == request.home)
-    away = stats_2025.filter(pl.col('team') == request.away)
+    home = stats_2025.filter(pl.col('team') == request.home_team)
+    away = stats_2025.filter(pl.col('team') == request.away_team)
 
     # === Predict the outcome of the game ===
 
@@ -91,7 +91,7 @@ def predict(request: MatchupRequest):
     outcome_probability = outcome_model.predict_proba(outcome_features)[0]
 
     # Get the winner of the matchup
-    winner = request.home if outcome_prediction == 1 else request.away
+    winner = request.home_team if outcome_prediction == 1 else request.away_team
 
     # Get the confidence of the prediction (in %)
     # selecting index 0 if the home team wins otherwise index 1 for away team
@@ -127,8 +127,8 @@ def predict(request: MatchupRequest):
     return {
         "winner": winner,
         "confidence": round(float(confidence), 2),
-        "home_team": request.home,
-        "away_team": request.away,
+        "home_team": request.home_team,
+        "away_team": request.away_team,
 
         "home_score_probabilities": home_score_dict,
         "away_score_probabilities": away_score_dict
