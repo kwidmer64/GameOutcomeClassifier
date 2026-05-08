@@ -35,8 +35,8 @@
     @* Results *@
     @if (predictionResult != null)
     {
-        var homeWinClass = predictionResult.Winner == predictionResult.HomeTeam ? "winner" : "";
-        var awayWinClass = predictionResult.Winner == predictionResult.AwayTeam ? "winner" : "";
+        var homeWinClass = predictionResult.Winner == predictionResult.HomeTeam ? "winner" : "loser";
+        var awayWinClass = predictionResult.Winner == predictionResult.AwayTeam ? "winner" : "loser";
 
         int awayRowCount = predictionResult.AwayScoreProbabilities.Count;
         int homeColCount = predictionResult.HomeScoreProbabilities.Count;
@@ -46,6 +46,9 @@
         foreach (var h in predictionResult.HomeScoreProbabilities)
             foreach (var a in predictionResult.AwayScoreProbabilities)
                 if (h.Value * a.Value > maxProb) maxProb = h.Value * a.Value;
+
+        double maxHomeProb = predictionResult.HomeScoreProbabilities.Values.Max();
+        double maxAwayProb = predictionResult.AwayScoreProbabilities.Values.Max();
 
         @* Matchup header *@
         <div class="panel-matchup-section">
@@ -93,9 +96,9 @@
                                                     {
                                                         var prob = home.Value * away.Value;
                                                         var intensity = maxProb > 0 ? prob / maxProb : 0;
-                                                        int r = (int)(18  + intensity * (245 - 18));
-                                                        int g = (int)(28  + intensity * (158 - 28));
-                                                        int b = (int)(50  + intensity * (11  - 50));
+                                                        int r = (int)(15  + intensity * (16  - 15));
+                                                        int g = (int)(23  + intensity * (185 - 23));
+                                                        int b = (int)(42  + intensity * (129 - 42));
                                                         var textAlpha = (0.35 + intensity * 0.65).ToString("F2");
                                                         var textColor = $"rgba(255,255,255,{textAlpha})";
                                                         <td class="sm-cell" style="background:rgb(@r,@g,@b);color:@textColor">
@@ -127,10 +130,16 @@
                             @foreach (var bucket in predictionResult.HomeScoreProbabilities)
                             {
                                 predictionResult.AwayScoreProbabilities.TryGetValue(bucket.Key, out var awayProb);
+                                var hi = maxHomeProb > 0 ? bucket.Value / maxHomeProb : 0;
+                                var ai = maxAwayProb > 0 ? awayProb / maxAwayProb : 0;
+                                int hr = (int)(15 + hi * (16  - 15)); int hg = (int)(23 + hi * (185 - 23)); int hb = (int)(42 + hi * (129 - 42));
+                                int ar = (int)(15 + ai * (16  - 15)); int ag = (int)(23 + ai * (185 - 23)); int ab = (int)(42 + ai * (129 - 42));
+                                var hAlpha = (0.35 + hi * 0.65).ToString("F2");
+                                var aAlpha = (0.35 + ai * 0.65).ToString("F2");
                                 <tr>
                                     <td class="sm-row-bucket">@bucket.Key</td>
-                                    <td class="prob-cell">@((bucket.Value * 100).ToString("F0"))%</td>
-                                    <td class="prob-cell">@((awayProb * 100).ToString("F0"))%</td>
+                                    <td class="prob-cell" style="background:rgb(@hr,@hg,@hb);color:rgba(255,255,255,@hAlpha)">@((bucket.Value * 100).ToString("F0"))%</td>
+                                    <td class="prob-cell" style="background:rgb(@ar,@ag,@ab);color:rgba(255,255,255,@aAlpha)">@((awayProb * 100).ToString("F0"))%</td>
                                 </tr>
                             }
                         </tbody>
