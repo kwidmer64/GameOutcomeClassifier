@@ -30,19 +30,37 @@ body {
   text-align: start;
 }
 
+/* === Custom properties === */
+:root {
+    --panel-bg: #0f172a;
+    --panel-dark: #0d1526;
+    --border-clr: #1e293b;
+    --input-bg: #1a2540;
+    --navy-mid: #2d3f5e;
+    --text-primary: #cbd5e1;
+    --text-secondary: #94a3b8;
+    --text-dim: #4a6080;
+    --text-label: #475569;
+    --text-faint: #334155;
+    --accent: #10b981;
+    --font-display: 'Bebas Neue', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --font-label: 'Rajdhani', sans-serif;
+}
+
 /* === Main panel === */
 .main-panel {
     max-width: 900px;
     margin: 0 auto;
-    background: #0f172a;
-    border: 1px solid #1e293b;
+    background: var(--panel-bg);
+    border: 1px solid var(--border-clr);
     border-radius: 12px;
     overflow: hidden;
 }
 
 .panel-form-section {
     padding: 1.1rem 1.5rem;
-    border-bottom: 1px solid #1e293b;
+    border-bottom: 1px solid var(--border-clr);
 }
 
 .panel-matchup-section {
@@ -55,20 +73,16 @@ body {
 
 /* === Team selector form === */
 .predict-form {
-    display: flex;
     gap: 0.75rem;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
 }
 
 .predict-select {
-    background: #1a2540;
-    color: #e2e8f0;
-    border: 1px solid #2d3f5e;
+    background: var(--input-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--navy-mid);
     border-radius: 6px;
     padding: 0.5rem 1rem;
-    font-family: 'Rajdhani', sans-serif;
+    font-family: var(--font-label);
     font-size: 1rem;
     font-weight: 600;
     letter-spacing: 0.04em;
@@ -85,14 +99,14 @@ body {
 }
 
 .predict-select option {
-    background: #1a2540;
-    color: #e2e8f0;
+    background: var(--input-bg);
+    color: var(--text-primary);
 }
 
 .vs-divider {
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: var(--font-display);
     font-size: 1rem;
-    color: #94a3b8;
+    color: var(--text-secondary);
     letter-spacing: 0.1em;
 }
 
@@ -102,7 +116,7 @@ body {
     border: none;
     border-radius: 6px;
     padding: 0.5rem 1.75rem;
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: var(--font-display);
     font-size: 1rem;
     letter-spacing: 0.15em;
     cursor: pointer;
@@ -121,20 +135,17 @@ body {
 
 /* === Matchup header === */
 .matchup-header {
-    display: flex;
-    align-items: stretch;
-    justify-content: center;
     gap: 2.5rem;
     padding: 1.4rem 0;
-    border-bottom: 1px solid #1e293b;
+    border-bottom: 1px solid var(--border-clr);
     margin-bottom: 1rem;
 }
 
 .team-display {
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: var(--font-display);
     font-size: 3.5rem;
     letter-spacing: 0.1em;
-    color: #cbd5e1;
+    color: var(--text-primary);
     line-height: 1;
     transition: color 0.2s;
     display: flex;
@@ -142,41 +153,30 @@ body {
 }
 
 .team-display.winner {
-    background: none;
-    color: #10b981;
+    color: var(--accent);
     text-shadow: 0 0 28px rgba(16,185,129,0.6), 0 0 56px rgba(16,185,129,0.22);
 }
 
 .team-display.loser {
-    color: #2d3f5e;
+    color: var(--navy-mid);
     opacity: 0.45;
 }
 
-.matchup-center {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-}
-
 .win-label {
-    font-family: 'Rajdhani', sans-serif;
+    font-family: var(--font-label);
     font-size: 0.7rem;
     font-weight: 600;
     letter-spacing: 0.15em;
-    color: #475569;
+    color: var(--text-label);
     text-transform: uppercase;
 }
 
 .confidence-block {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
     line-height: 1;
 }
 
 .confidence-value {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 1.5rem;
     font-weight: 600;
     color: #60a5fa;
@@ -184,23 +184,23 @@ body {
 }
 
 .confidence-tag {
-    font-family: 'Rajdhani', sans-serif;
+    font-family: var(--font-label);
     font-size: 0.6rem;
     font-weight: 600;
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: #334155;
+    color: var(--text-faint);
     margin-top: 0.2rem;
 }
 
 /* === Score probability matrix === */
 .matrix-section-label {
-    font-family: 'Rajdhani', sans-serif;
+    font-family: var(--font-label);
     font-size: 0.72rem;
     font-weight: 600;
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: #94a3b8;
+    color: var(--text-secondary);
     text-align: center;
     margin-bottom: 0.75rem;
 }
@@ -211,7 +211,7 @@ body {
 
 .score-matrix {
     border-collapse: collapse;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 0.94rem;
     line-height: 1;
     width: 100%;
@@ -220,31 +220,19 @@ body {
 .score-matrix th,
 .score-matrix td {
     padding: 0.42rem 0.65rem;
-    border: 1px solid #1e293b;
+    border: 1px solid var(--border-clr);
     text-align: center;
     white-space: nowrap;
 }
 
 /* === Matrix + prob panels layout === */
 .matrix-and-probs {
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
     gap: 1.5rem;
-    flex-wrap: wrap;
-}
-
-.matrix-container {
-    flex-shrink: 0;
-}
-
-.prob-comparison-container {
-    flex-shrink: 0;
 }
 
 .prob-comparison-table {
     border-collapse: collapse;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 0.94rem;
     line-height: 1;
 }
@@ -252,7 +240,7 @@ body {
 .prob-comparison-table th,
 .prob-comparison-table td {
     padding: 0.42rem 0.9rem;
-    border: 1px solid #1e293b;
+    border: 1px solid var(--border-clr);
     text-align: center;
     white-space: nowrap;
 }
@@ -263,16 +251,16 @@ body {
 }
 
 .prob-team-header {
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: var(--font-display);
     font-size: 0.94rem;
     letter-spacing: 0.12em;
-    color: #cbd5e1;
-    background: #0d1526;
+    color: var(--text-primary);
+    background: var(--panel-dark);
     text-transform: uppercase;
 }
 
 .prob-cell {
-    color: #e2e8f0;
+    color: var(--text-primary);
     background: #111827;
     font-weight: 600;
     font-size: 0.90rem;
@@ -280,40 +268,34 @@ body {
 
 /* === Matrix layout & axis labels === */
 .matrix-layout {
-    display: flex;
-    flex-direction: column;
     gap: 0.3rem;
 }
 
 .matrix-col-label {
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: var(--font-display);
     font-size: 1.02rem;
     letter-spacing: 0.15em;
-    color: #cbd5e1;
+    color: var(--text-primary);
     text-align: center;
     text-transform: uppercase;
     margin-bottom: 0.2rem;
 }
 
 .matrix-body {
-    display: flex;
-    align-items: center;
     gap: 0.4rem;
 }
 
 .matrix-right {
-    display: flex;
-    flex-direction: column;
     min-width: 0;
 }
 
 .matrix-row-label {
     writing-mode: vertical-lr;
     transform: rotate(180deg);
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: var(--font-display);
     font-size: 1.02rem;
     letter-spacing: 0.15em;
-    color: #cbd5e1;
+    color: var(--text-primary);
     text-transform: uppercase;
     white-space: nowrap;
     flex-shrink: 0;
@@ -321,28 +303,28 @@ body {
 
 /* === Matrix axis labels === */
 .sm-corner {
-    background: #0d1526;
+    background: var(--panel-dark);
 }
 
 .sm-home-bucket {
-    background: #0d1526;
-    color: #4a6080;
+    background: var(--panel-dark);
+    color: var(--text-dim);
     font-size: 0.86rem;
     letter-spacing: 0.03em;
 }
 
 .sm-row-bucket {
-    background: #0d1526;
-    color: #4a6080;
+    background: var(--panel-dark);
+    color: var(--text-dim);
     font-size: 0.86rem;
     letter-spacing: 0.03em;
-    border-right: 1px solid #1e293b;
+    border-right: 1px solid var(--border-clr);
 }
 
 .sm-cell {
     font-weight: 600;
     cursor: default;
-    transition: filter 0.12s ease, outline 0.12s ease;
+    transition: filter 0.12s ease;
     font-size: 0.90rem;
 }
 
