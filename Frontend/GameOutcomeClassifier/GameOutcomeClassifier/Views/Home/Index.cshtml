@@ -62,7 +62,7 @@
                 <div class="matchup-center d-flex flex-column justify-content-between align-items-center">
                     <span class="win-label">@predictionResult.Winner wins</span>
                     <div class="confidence-block d-flex flex-column align-items-center">
-                        <span class="confidence-value">@predictionResult.Confidence</span>
+                        <span class="confidence-value">@((predictionResult.Confidence * 100).ToString("F0"))%</span>
                         <span class="confidence-tag">prediction confidence</span>
                     </div>
                 </div>
