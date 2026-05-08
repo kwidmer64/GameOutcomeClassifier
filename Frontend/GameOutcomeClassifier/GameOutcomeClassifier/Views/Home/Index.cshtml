@@ -42,8 +42,15 @@
 
         double maxProb = 0;
         foreach (var h in predictionResult.HomeScoreProbabilities)
+        {
             foreach (var a in predictionResult.AwayScoreProbabilities)
-                if (h.Value * a.Value > maxProb) maxProb = h.Value * a.Value;
+            {
+                if (h.Value * a.Value > maxProb)
+                {
+                    maxProb = h.Value * a.Value;
+                }
+            }
+        }
 
         double maxHomeProb = predictionResult.HomeScoreProbabilities.Values.Max();
         double maxAwayProb = predictionResult.AwayScoreProbabilities.Values.Max();
