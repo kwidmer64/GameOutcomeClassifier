@@ -17,14 +17,14 @@
             <select name="homeTeam" id="homeTeam" class="predict-select">
                 @foreach (var item in teams)
                 {
-                    <option value="@item.Key">@item.Value</option>
+                    <option value="@item.Key" selected="@(predictionResult != null && item.Key == predictionResult.HomeTeam)">@item.Value</option>
                 }
             </select>
             <span class="vs-divider">VS</span>
             <select name="awayTeam" id="awayTeam" class="predict-select">
                 @foreach (var item in teams)
                 {
-                    <option value="@item.Key">@item.Value</option>
+                    <option value="@item.Key" selected="@(predictionResult != null && item.Key == predictionResult.AwayTeam)">@item.Value</option>
                 }
             </select>
             <button asp-controller="Home" asp-action="Predict" type="submit" class="predict-btn">Predict</button>
