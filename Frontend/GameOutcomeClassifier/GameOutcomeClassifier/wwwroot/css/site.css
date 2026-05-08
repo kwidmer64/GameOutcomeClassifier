@@ -18,7 +18,96 @@ html {
 }
 
 body {
-  margin-bottom: 60px;
+  background: var(--panel-bg);
+  margin-bottom: 0;
+}
+
+/* === Site nav === */
+.site-nav {
+    background: var(--panel-dark);
+    border-bottom: 1px solid var(--border-clr);
+    padding: 0 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.site-nav-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 3.5rem;
+}
+
+.site-brand {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    text-decoration: none;
+    line-height: 1;
+}
+
+.site-brand:hover {
+    color: var(--accent);
+    text-decoration: none;
+}
+
+.sport-tabs {
+    display: flex;
+    gap: 0.25rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.sport-tab {
+    font-family: var(--font-label);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.75rem;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background 0.15s, color 0.15s;
+    border: 1px solid transparent;
+    line-height: 1.4;
+}
+
+.sport-tab--active {
+    background: rgba(16,185,129,0.12);
+    color: var(--accent);
+    border-color: rgba(16,185,129,0.3);
+}
+
+.sport-tab--active:hover {
+    background: rgba(16,185,129,0.2);
+    color: var(--accent);
+    text-decoration: none;
+}
+
+.sport-tab--soon {
+    color: var(--text-dim);
+    opacity: 0.45;
+    cursor: default;
+    pointer-events: none;
+}
+
+/* === Site footer === */
+.site-footer {
+    border-top: 1px solid var(--border-clr);
+    padding: 1.1rem 1.5rem;
+    margin-top: 1.5rem;
+    text-align: center;
+}
+
+.site-footer-text {
+    font-family: var(--font-label);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-faint);
 }
 
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
