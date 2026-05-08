@@ -123,7 +123,7 @@ def predict(request: MatchupRequest):
     home_score_dict = {label: round(probability, 2) for label, probability in zip(BUCKET_LABELS, home_score_probability.tolist())}
     away_score_dict = {label: round(probability, 2) for label, probability in zip(BUCKET_LABELS, away_score_probability.tolist())}
 
-    # Return the predicted winner, confidence, and score probabilities for both teams.
+    # Return the predicted winner, confidence, score probabilities, and raw stats for both teams.
     return {
         "winner": winner,
         "confidence": round(float(confidence), 2),
@@ -131,7 +131,18 @@ def predict(request: MatchupRequest):
         "away_team": request.away_team,
 
         "home_score_probabilities": home_score_dict,
-        "away_score_probabilities": away_score_dict
+        "away_score_probabilities": away_score_dict,
+
+        "home_stats": {
+            "win_pct": round(float(home['win_pct'][0]), 4),
+            "ppg": round(float(home['ppg'][0]), 1),
+            "opp_ppg": round(float(home['opp_ppg'][0]), 1),
+        },
+        "away_stats": {
+            "win_pct": round(float(away['win_pct'][0]), 4),
+            "ppg": round(float(away['ppg'][0]), 1),
+            "opp_ppg": round(float(away['opp_ppg'][0]), 1),
+        },
     }
 
 # GET /teams endpoints
