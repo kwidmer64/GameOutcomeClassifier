@@ -153,5 +153,34 @@
 
             </div>
         </div>
+        @* Matchup feature stats *@
+        <div class="panel-stats-section d-flex justify-content-center">
+            <table class="prob-comparison-table">
+                <thead>
+                    <tr>
+                        <th class="sm-corner"></th>
+                        <th class="prob-team-header">@predictionResult.HomeTeam</th>
+                        <th class="prob-team-header">@predictionResult.AwayTeam</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="sm-row-bucket">Win %</td>
+                        <td class="prob-cell">@((predictionResult.HomeStats.WinPct * 100).ToString("F0"))%</td>
+                        <td class="prob-cell">@((predictionResult.AwayStats.WinPct * 100).ToString("F0"))%</td>
+                    </tr>
+                    <tr>
+                        <td class="sm-row-bucket">Pts/Game</td>
+                        <td class="prob-cell">@predictionResult.HomeStats.Ppg.ToString("F1")</td>
+                        <td class="prob-cell">@predictionResult.AwayStats.Ppg.ToString("F1")</td>
+                    </tr>
+                    <tr>
+                        <td class="sm-row-bucket">Pts Allow</td>
+                        <td class="prob-cell">@predictionResult.HomeStats.OppPpg.ToString("F1")</td>
+                        <td class="prob-cell">@predictionResult.AwayStats.OppPpg.ToString("F1")</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     }
 </div>

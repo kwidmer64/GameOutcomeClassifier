@@ -8,5 +8,7 @@
         public string AwayTeam { get; set; } = "";
         public Dictionary<string, double> HomeScoreProbabilities { get; set; } = new Dictionary<string, double>();
         public Dictionary<string, double> AwayScoreProbabilities { get; set; } = new Dictionary<string, double>();
+        public TeamStats HomeStats { get; set; } = new();
+        public TeamStats AwayStats { get; set; } = new();
     }
 }
