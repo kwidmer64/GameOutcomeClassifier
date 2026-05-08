@@ -10,70 +10,134 @@
     Dictionary<string, string> teams = Model.Teams;
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    @* Populate form inputs*@
-    <form method="post">
-        <select name="homeTeam" id="homeTeam">
-            @foreach (var item in teams)
-            {
-                <option value="@item.Key">@item.Value</option>
-            }
-        </select>
-        <select name="awayTeam" id="awayTeam">
-            @foreach (var item in teams)
-            {
-                <option value="@item.Key">@item.Value</option>
-            }
-        </select>
-        <button asp-controller="Home" asp-action="Predict" type="submit" class="btn btn-outline-primary">Go</button>
-    </form>
+<div class="main-panel">
 
-    @* Check is the predictionResult is populated yet *@
+    @* Team selector form *@
+    <div class="panel-form-section">
+        <form method="post" class="predict-form">
+            <select name="homeTeam" id="homeTeam" class="predict-select">
+                @foreach (var item in teams)
+                {
+                    <option value="@item.Key">@item.Value</option>
+                }
+            </select>
+            <span class="vs-divider">VS</span>
+            <select name="awayTeam" id="awayTeam" class="predict-select">
+                @foreach (var item in teams)
+                {
+                    <option value="@item.Key">@item.Value</option>
+                }
+            </select>
+            <button asp-controller="Home" asp-action="Predict" type="submit" class="predict-btn">Predict</button>
+        </form>
+    </div>
+
+    @* Results *@
     @if (predictionResult != null)
     {
-        // Apply styling to the winning team
         var homeWinClass = predictionResult.Winner == predictionResult.HomeTeam ? "winner" : "";
         var awayWinClass = predictionResult.Winner == predictionResult.AwayTeam ? "winner" : "";
 
-        <div class="d-flex">
-            <h1 class="@homeWinClass">@predictionResult.HomeTeam</h1>
-            <h1 class="@awayWinClass">@predictionResult.AwayTeam</h1>
+        int awayRowCount = predictionResult.AwayScoreProbabilities.Count;
+        int homeColCount = predictionResult.HomeScoreProbabilities.Count;
+
+        // Pre-compute max cell probability for heat map normalization
+        double maxProb = 0;
+        foreach (var h in predictionResult.HomeScoreProbabilities)
+            foreach (var a in predictionResult.AwayScoreProbabilities)
+                if (h.Value * a.Value > maxProb) maxProb = h.Value * a.Value;
+
+        @* Matchup header *@
+        <div class="panel-matchup-section">
+            <div class="matchup-header">
+                <span class="team-display @homeWinClass">@predictionResult.HomeTeam</span>
+                <div class="matchup-center">
+                    <span class="win-label">@predictionResult.Winner wins</span>
+                    <div class="confidence-block">
+                        <span class="confidence-value">@predictionResult.Confidence</span>
+                        <span class="confidence-tag">prediction confidence</span>
+                    </div>
+                </div>
+                <span class="team-display @awayWinClass">@predictionResult.AwayTeam</span>
+            </div>
         </div>
 
-        <h1>@predictionResult.Confidence</h1>
+        @* Score probability matrix + individual probabilities *@
+        <div class="panel-matrix-section">
+            <div class="matrix-and-probs">
 
-        // Matrix for score probabilities
-        <div id="probabilityMatrix" class="container text-center">
+                @* Matrix *@
+                <div class="matrix-container">
+                    <div class="matrix-layout">
+                        <div class="matrix-body">
+                            <div class="matrix-row-label">@predictionResult.AwayTeam</div>
+                            <div class="matrix-right">
+                                <div class="matrix-col-label">@predictionResult.HomeTeam</div>
+                                <div class="score-matrix-wrapper">
+                                    <table class="score-matrix">
+                                        <thead>
+                                            <tr>
+                                                <th class="sm-corner"></th>
+                                                @foreach (var homeBucket in predictionResult.HomeScoreProbabilities)
+                                                {
+                                                    <th class="sm-home-bucket">@homeBucket.Key</th>
+                                                }
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var away in predictionResult.AwayScoreProbabilities)
+                                            {
+                                                <tr>
+                                                    <td class="sm-row-bucket">@away.Key</td>
+                                                    @foreach (var home in predictionResult.HomeScoreProbabilities)
+                                                    {
+                                                        var prob = home.Value * away.Value;
+                                                        var intensity = maxProb > 0 ? prob / maxProb : 0;
+                                                        int r = (int)(18  + intensity * (245 - 18));
+                                                        int g = (int)(28  + intensity * (158 - 28));
+                                                        int b = (int)(50  + intensity * (11  - 50));
+                                                        var textAlpha = (0.35 + intensity * 0.65).ToString("F2");
+                                                        var textColor = $"rgba(255,255,255,{textAlpha})";
+                                                        <td class="sm-cell" style="background:rgb(@r,@g,@b);color:@textColor">
+                                                            @((prob * 100).ToString("F0"))%
+                                                        </td>
+                                                    }
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
+                @* Individual score probabilities *@
+                <div class="prob-comparison-container">
+                    <div class="matrix-col-label prob-align-spacer" aria-hidden="true">&nbsp;</div>
+                    <table class="prob-comparison-table">
+                        <thead>
+                            <tr>
+                                <th class="sm-corner"></th>
+                                <th class="prob-team-header">@predictionResult.HomeTeam</th>
+                                <th class="prob-team-header">@predictionResult.AwayTeam</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var bucket in predictionResult.HomeScoreProbabilities)
+                            {
+                                predictionResult.AwayScoreProbabilities.TryGetValue(bucket.Key, out var awayProb);
+                                <tr>
+                                    <td class="sm-row-bucket">@bucket.Key</td>
+                                    <td class="prob-cell">@((bucket.Value * 100).ToString("F0"))%</td>
+                                    <td class="prob-cell">@((awayProb * 100).ToString("F0"))%</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
         </div>
-
-        <table class="table table-bordered">
-            
-            <thead>
-                <tr>
-                    <th colspan="7">@predictionResult.AwayTeam</th>
-                </tr>
-                <tr>
-                    <th scope="col" class="table-head-col"></th>
-                    @foreach (var awayBucket in predictionResult.AwayScoreProbabilities)
-                    {
-                        <th scope="col">@awayBucket.Key</th>
-                    }
-                </tr>
-            </thead>
-            <tbody class="table-group-divider">            
-                @foreach (var homeProbabilities in predictionResult.HomeScoreProbabilities)
-                {
-                    <tr>
-                        <td scope="row" class="table-head-col">@homeProbabilities.Key</td>
-                        @foreach (var awayProbabilities in predictionResult.AwayScoreProbabilities)
-                        {
-                            <td>@((homeProbabilities.Value * awayProbabilities.Value * 100).ToString("F0"))%</td>
-                        }
-                    </tr>
-                }
-            </tbody>
-        </table>
     }
 </div>
