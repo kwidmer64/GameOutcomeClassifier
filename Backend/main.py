@@ -79,9 +79,11 @@ def predict(request: MatchupRequest):
         home['win_pct'][0],
         home['ppg'][0],
         home['opp_ppg'][0],
+        home['third_down_stop_pct'][0],
         away['win_pct'][0],
         away['ppg'][0],
-        away['opp_ppg'][0]
+        away['opp_ppg'][0],
+        away['third_down_stop_pct'][0],
     ]]
 
     # Predict the outcome of the matchup with the selected features
@@ -137,11 +139,13 @@ def predict(request: MatchupRequest):
             "win_pct": round(float(home['win_pct'][0]), 4),
             "ppg": round(float(home['ppg'][0]), 1),
             "opp_ppg": round(float(home['opp_ppg'][0]), 1),
+            "third_down_stop_pct": round(float(home['third_down_stop_pct'][0]), 4),
         },
         "away_stats": {
             "win_pct": round(float(away['win_pct'][0]), 4),
             "ppg": round(float(away['ppg'][0]), 1),
             "opp_ppg": round(float(away['opp_ppg'][0]), 1),
+            "third_down_stop_pct": round(float(away['third_down_stop_pct'][0]), 4),
         },
     }
 
