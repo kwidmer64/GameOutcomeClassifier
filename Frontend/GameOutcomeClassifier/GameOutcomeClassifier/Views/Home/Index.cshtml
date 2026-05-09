@@ -175,9 +175,14 @@
                         <td class="prob-cell">@predictionResult.AwayStats.Ppg.ToString("F1")</td>
                     </tr>
                     <tr>
-                        <td class="sm-row-bucket">Pts Allow</td>
+                        <td class="sm-row-bucket">Pts Allowed/Game</td>
                         <td class="prob-cell">@predictionResult.HomeStats.OppPpg.ToString("F1")</td>
                         <td class="prob-cell">@predictionResult.AwayStats.OppPpg.ToString("F1")</td>
+                    </tr>
+                    <tr>
+                        <td class="sm-row-bucket">3rd Down Stop %</td>
+                        <td class="prob-cell">@((predictionResult.HomeStats.ThirdDownStopPct * 100).ToString("F0"))%</td>
+                        <td class="prob-cell">@((predictionResult.AwayStats.ThirdDownStopPct * 100).ToString("F0"))%</td>
                     </tr>
                 </tbody>
             </table>
